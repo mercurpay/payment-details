@@ -60,28 +60,33 @@ class PaymentProducerVerticle : AbstractVerticle() {
     }
 
     private fun findById(routing: RoutingContext) {
-        val id = routing.request().getParam("id")
         val traceId = UUID.randomUUID().toString()
-        log.info("[$traceId] Message sent")
-        val deliveryOptions = DeliveryOptions().addHeader("traceId", traceId)
-        this.vertx.eventBus()
-                .rxSend<Payment>(PaymentConsumerVerticle.ADDRESS, UUID.fromString(id), deliveryOptions)
-                .map { it.body() }
-                .map { Json.encodePrettily(it) }
-                .doOnSuccess {
-                    routing.response()
-                            .putHeader("Content-Type", "application/json;charset=UTF-8")
-                            .setStatusCode(200)
-                            .end(it)
-                }
-                .doOnError {
-                    log.error("[$traceId] Failed to get payment", it)
-                    routing.response()
-                            .putHeader("Content-Type", "application/json;charset=UTF-8")
-                            .setStatusCode(500)
-                            .end(JsonObject().put("message", it.message).encodePrettily())
-                }
-                .subscribe()
+        try {
+            val id = routing.request().getParam("id")!!
+            log.info("[$traceId] Message sent")
+            val deliveryOptions = DeliveryOptions().addHeader("traceId", traceId)
+            this.vertx.eventBus()
+                    .rxSend<Payment>(PaymentConsumerVerticle.ADDRESS, UUID.fromString(id), deliveryOptions)
+                    .map { it.body() }
+                    .map { Json.encodePrettily(it) }
+                    .doOnSuccess {
+                        routing.response()
+                                .putHeader("Content-Type", "application/json;charset=UTF-8")
+                                .setStatusCode(200)
+                                .end(it)
+                    }
+                    .doOnError {
+                        log.error("[$traceId] Failed to get payment", it)
+                        routing.response()
+                                .putHeader("Content-Type", "application/json;charset=UTF-8")
+                                .setStatusCode(500)
+                                .end(JsonObject().put("message", it.message).encodePrettily())
+                    }
+                    .subscribe()
+        } catch (e: Exception) {
+            log.error("[$traceId] Failed to get payment", e)
+            throw e
+        }
     }
 
     private fun update(routing: RoutingContext) {
