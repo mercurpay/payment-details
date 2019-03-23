@@ -7,6 +7,12 @@
   <groupId>br.com.kurtis</groupId>
   <artifactId>payment-details</artifactId>
   <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>web-server</module>
+    <module>payments</module>
+  </modules>
 
   <properties>
     <java.version>1.8</java.version>
@@ -24,8 +30,6 @@
     <junit-platform-launcher.version>1.4.0</junit-platform-launcher.version>
     <log4j.version>2.11.2</log4j.version>
     <vertx.version>3.6.3</vertx.version>
-
-    <main.verticle>br.com.kurtis.payment_details.PaymentProducerVerticle</main.verticle>
   </properties>
 
   <dependencyManagement>
@@ -54,11 +58,6 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-rx-java2</artifactId>
-      <version>${vertx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web</artifactId>
       <version>${vertx.version}</version>
     </dependency>
     <dependency>
@@ -138,35 +137,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>${maven-shade-plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>io.vertx.core.Launcher</Main-Class>
-                    <Main-Verticle>${main.verticle}</Main-Verticle>
-                  </manifestEntries>
-                </transformer>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                  <resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
-                </transformer>
-              </transformers>
-              <artifactSet>
-              </artifactSet>
-              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <dependencies>
@@ -176,18 +146,6 @@
             <version>${junit-jupiter.version}</version>
           </dependency>
         </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${exec-maven-plugin.version}</version>
-        <configuration>
-          <mainClass>io.vertx.core.Launcher</mainClass>
-          <arguments>
-            <argument>run</argument>
-            <argument>${main.verticle}</argument>
-          </arguments>
-        </configuration>
       </plugin>
     </plugins>
   </build>

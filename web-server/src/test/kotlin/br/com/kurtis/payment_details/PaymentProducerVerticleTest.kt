@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.io.IOException
 import java.net.ServerSocket
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @ExtendWith(VertxExtension::class)
@@ -38,13 +39,13 @@ class PaymentProducerVerticleTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     internal fun testHttpServer(vertx: Vertx, context: VertxTestContext) {
         WebClient.create(vertx)
-                .get(this.port, "localhost", "/")
+                .get(this.port, "localhost", "/payments/${UUID.randomUUID()}")
                 .`as`(BodyCodec.string())
                 .send {
                     assertThat(it.succeeded()).isTrue()
                     log.info("Server receive successfully the request")
                     val response = it.result()
-                    assertThat(response.body()).contains("Vert.x 3 Application")
+                    assertThat(response.statusCode()).isEqualTo(200)
                     log.info("The response contains the expected body")
                     context.completeNow()
                 }

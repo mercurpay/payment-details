@@ -21,12 +21,11 @@ class PaymentProducerVerticle : AbstractVerticle() {
 
     private val log = LoggerFactory.getLogger(PaymentProducerVerticle::class.java)
 
-    override fun init(vertx: Vertx?, context: Context?) {
+    override fun init(vertx: Vertx, context: Context?) {
         super.init(vertx, context)
-        vertx?.deployVerticle(PaymentConsumerVerticle::class.java.name)
-        val eventBus = vertx?.eventBus()
-        eventBus?.registerDefaultCodec(UUID::class.java, UUIDMessageCodec())
-        eventBus?.registerDefaultCodec(Payment::class.java, PaymentMessageCodec())
+        vertx.deployVerticle(PaymentConsumerVerticle::class.java.name)
+        val eventBus = vertx.eventBus()!!
+        eventBus.registerDefaultCodec(UUID::class.java, UUIDMessageCodec())
     }
 
     override fun start(bootstrap: Future<Void>) {
